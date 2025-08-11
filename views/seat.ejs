@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Seat Booking</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+#login, #seatingArea {
+    margin-top: 50px;
+}
+
+#seats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.seat {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.available {
+    background-color: green;
+}
+
+.booked {
+    background-color: red;
+}
+
+#status {
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: black;
+}
+
+
+    </style>
+</head>
+<body>
+    <h1>Library Seat Booking</h1>
+    <div id="login">
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+    <div id="seatingArea" style="display: none;">
+        <h2>Seating Arrangement</h2>
+        <div id="status">
+            <span>Available Seats: <span id="availableSeats">0</span></span>
+            <span>Booked Seats: <span id="bookedSeats">0</span></span>
+            <span>Total Seats: <span id="totalSeats">50</span></span>
+        </div>
+        <div id="seats"></div>
+        <button onclick="exitSeat()">Exit</button>
+    </div>
+    <script>
+   
+   let loggedInUser = null;
+const seats = Array(50).fill(null); // Assuming 50 seats
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username && password) {
+        loggedInUser = username;
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('seatingArea').style.display = 'block';
+        renderSeats();
+    } else {
+        alert('Please enter both username and password.');
+    }
+}
+
+function renderSeats() {
+    const seatsDiv = document.getElementById('seats');
+    seatsDiv.innerHTML = '';
+
+    seats.forEach((user, index) => {
+        const seat = document.createElement('div');
+        seat.className = `seat ${user ? 'booked' : 'available'}`;
+        seat.innerText = index + 1;
+        seat.onclick = () => bookSeat(index);
+        seatsDiv.appendChild(seat);
+    });
+
+    updateStatus();
+}
+
+function bookSeat(index) {
+    if (!seats[index]) {
+        if (!seats.includes(loggedInUser)) {
+            seats[index] = loggedInUser;
+            renderSeats();
+        } else {
+            alert('You cannot book another seat until you exit the current one.');
+        }
+    } else if (seats[index] === loggedInUser) {
+        alert('You already booked this seat.');
+    } else {
+        alert('This seat is already booked.');
+    }
+}
+
+function exitSeat() {
+    const bookedIndex = seats.findIndex(user => user === loggedInUser);
+
+    if (bookedIndex !== -1) {
+        seats[bookedIndex] = null;
+        renderSeats();
+    } else {
+        alert('You do not have any seat booked.');
+    }
+}
+
+function updateStatus() {
+    const availableSeats = seats.filter(user => !user).length;
+    const bookedSeats = seats.filter(user => user).length;
+    document.getElementById('availableSeats').textContent = availableSeats;
+    document.getElementById('bookedSeats').textContent = bookedSeats;
+}
+
+window.onload = () => {
+    document.getElementById('totalSeats').textContent = seats.length;
+}
+
+
+    </script>
+</body>
+</html>
